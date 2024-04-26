@@ -4,25 +4,24 @@ import { people } from './data/data';
 import { Human } from './data/data.interface';
 
 interface ILocalStoreGet {
-  count: number | null;
+  count: number;
 }
 
 function App() {
   const [ count, setCount ] = useState(0);
 
   useEffect(() => {
-    const localStoreGet: ILocalStoreGet = localStorage.getItem('localState');
+    const localStoreGet: ILocalStoreGet = sessionStorage.getItem('localState');
     const parsedState = JSON.parse(localStoreGet);
-    setCount(parsedState);
-    console.log('get: ' + parsedState)
+    if(parsedState !== null) setCount(parsedState);
   },[])
 
   useEffect(() => {
-    if(count !== 0) localStorage.setItem('localState', JSON.stringify(count));
+    if(count !== 0 && count !== null) sessionStorage.setItem('localState', JSON.stringify(count));
   }, [count])
 
-  const debounce = (func: Function, delay: number) => {
-    let timerId: NodeJS.Timeout;
+  const debounce = (func: (...args: unknown[]) => void, delay: number) => {
+    let timerId: number;
     return function (...args: any[]) {
       clearTimeout(timerId);
       timerId = setTimeout(() => func.apply(this, args), delay);
@@ -39,11 +38,10 @@ function App() {
   }
 
   const peopleCount = (data: Human[]) => {
-    return data.map((item, index) => {
-      return `${item.name} and ${index}`
+    return data.map((item) => {
+      return `${item.name}`
     })
   }
-
 
   return (
       <>
